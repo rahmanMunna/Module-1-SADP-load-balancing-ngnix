@@ -1,12 +1,20 @@
 import { Controller, Get } from '@nestjs/common';
-import { AppService } from './app.service.js';
+import { hostname } from 'os';
+
+let visits = 0; // in-memory state: the bug on purpose
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  @Get('whoami')
+  whoami() { return { instance: hostname() }; }
 
-  @Get()
-  getHello(): string {
-    return this.appService.getHello();
+  @Get('work') // simulates CPU-heavy work
+  work() {
+    let x = 0;
+    for (let i = 0; i < 5e7; i++) x += i;
+    return { instance: hostname() };
   }
+
+  @Get('visit')
+  visit() { return { instance: hostname(), visits: ++visits }; }
 }
